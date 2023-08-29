@@ -29,9 +29,9 @@ const validarJWT = (req,res,next)=>{
         
     }
 
-
-
 };
+
+
 
 const validarADMIN_ROLE = async (req,res,next) =>{
 
@@ -67,9 +67,46 @@ const validarADMIN_ROLE = async (req,res,next) =>{
 
 };
 
+const validarADMIN_ROLE_o_MismoUsuario = async (req,res,next) =>{
+
+    try {
+
+        const uid = req.uid;
+        const id  = req.params.id;
+        const usuarioDB = await Usuario.findById(uid);
+
+        if (!usuarioDB){
+            return res.status(404).json({
+                ok : false,
+                msg : 'Usuario no existe'
+            })
+        };
+
+        if (usuarioDB.role === 'ADMIN_ROLE' || id === uid){
+            next()
+        }else{
+            return res.status(403).json({
+                ok : false,
+                msg : 'Usuario no autorizado'
+            })
+        };
+
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok : false,
+            msg : 'Hable con el administrador'
+        })
+        
+    }
+
+};
+
 
 module.exports = {
     validarJWT,
-    validarADMIN_ROLE
+    validarADMIN_ROLE,
+    validarADMIN_ROLE_o_MismoUsuario
 }
 
